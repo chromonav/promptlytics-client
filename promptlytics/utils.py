@@ -8,24 +8,24 @@ from copy import deepcopy
 
 import requests
 
-import promptlayer
+import promptlytics
 
-URL_API_PROMPTLAYER = os.environ.setdefault(
-    "URL_API_PROMPTLAYER", "https://api.promptlayer.com"
+URL_API_PROMPTLYTICS = os.environ.setdefault(
+    "URL_API_PROMPTLYTICS", "https://api.promptlytics.com"
 )
 
 
 def get_api_key():
     # raise an error if the api key is not set
-    if promptlayer.api_key is None:
+    if promptlytics.api_key is None:
         raise Exception(
-            "Please set your PROMPTLAYER_API_KEY environment variable or set API KEY in code using 'promptlayer.api_key = <your_api_key>' "
+            "Please set your PROMPTLYTICS_API_KEY environment variable or set API KEY in code using 'promptlytics.api_key = <your_api_key>' "
         )
     else:
-        return promptlayer.api_key
+        return promptlytics.api_key
 
 
-def promptlayer_api_handler(
+def promptlytics_api_handler(
     function_name,
     provider_type,
     args,
@@ -54,7 +54,7 @@ def promptlayer_api_handler(
             },
         )
     else:
-        request_id = promptlayer_api_request(
+        request_id = promptlytics_api_request(
             function_name,
             provider_type,
             args,
@@ -71,7 +71,7 @@ def promptlayer_api_handler(
         return response
 
 
-async def promptlayer_api_handler_async(
+async def promptlytics_api_handler_async(
     function_name,
     provider_type,
     args,
@@ -85,7 +85,7 @@ async def promptlayer_api_handler_async(
 ):
     return await run_in_thread_async(
         None,
-        promptlayer_api_handler,
+        promptlytics_api_handler,
         function_name,
         provider_type,
         args,
@@ -99,7 +99,7 @@ async def promptlayer_api_handler_async(
     )
 
 
-def promptlayer_api_request(
+def promptlytics_api_request(
     function_name,
     provider_type,
     args,
@@ -115,7 +115,7 @@ def promptlayer_api_request(
         response = response.to_dict_recursive()
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/track-request",
+            f"{URL_API_PROMPTLYTICS}/track-request",
             json={
                 "function_name": function_name,
                 "provider_type": provider_type,
@@ -131,24 +131,24 @@ def promptlayer_api_request(
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 print(
-                    f"WARNING: While logging your request PromptLayer had the following error: {request_response.json().get('message')}",
+                    f"WARNING: While logging your request Promptlytics had the following error: {request_response.json().get('message')}",
                     file=sys.stderr,
                 )
             else:
                 print(
-                    f"WARNING: While logging your request PromptLayer had the following error: {request_response}",
+                    f"WARNING: While logging your request Promptlytics had the following error: {request_response}",
                     file=sys.stderr,
                 )
     except Exception as e:
         print(
-            f"WARNING: While logging your request PromptLayer had the following error: {e}",
+            f"WARNING: While logging your request Promptlytics had the following error: {e}",
             file=sys.stderr,
         )
     if return_pl_id:
         return request_response.json().get("request_id")
 
 
-def promptlayer_api_request_async(
+def promptlytics_api_request_async(
     function_name,
     provider_type,
     args,
@@ -162,7 +162,7 @@ def promptlayer_api_request_async(
 ):
     return run_in_thread_async(
         None,
-        promptlayer_api_request,
+        promptlytics_api_request,
         function_name,
         provider_type,
         args,
@@ -176,37 +176,37 @@ def promptlayer_api_request_async(
     )
 
 
-def promptlayer_get_prompt(prompt_name, api_key, version=None):
+def promptlytics_get_prompt(prompt_name, api_key, version=None):
     """
-    Get a prompt from the PromptLayer library
+    Get a prompt from the Promptlytics library
     version: version of the prompt to get, None for latest
     """
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/library-get-prompt-template",
+            f"{URL_API_PROMPTLYTICS}/library-get-prompt-template",
             json={"prompt_name": prompt_name,
                   "api_key": api_key, 'version': version},
         )
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 raise Exception(
-                    f"PromptLayer had the following error while getting your prompt: {request_response.json().get('message')}"
+                    f"Promptlytics had the following error while getting your prompt: {request_response.json().get('message')}"
                 )
             else:
                 raise Exception(
-                    f"PromptLayer had the following error while getting your prompt: {request_response}"
+                    f"Promptlytics had the following error while getting your prompt: {request_response}"
                 )
     except Exception as e:
         raise Exception(
-            f"PromptLayer had the following error while getting your prompt: {e}"
+            f"Promptlytics had the following error while getting your prompt: {e}"
         )
     return request_response.json()
 
 
-def promptlayer_publish_prompt(prompt_name, prompt_template, tags, api_key):
+def promptlytics_publish_prompt(prompt_name, prompt_template, tags, api_key):
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/library-publish-prompt-template",
+            f"{URL_API_PROMPTLYTICS}/library-publish-prompt-template",
             json={
                 "prompt_name": prompt_name,
                 "prompt_template": prompt_template,
@@ -217,23 +217,23 @@ def promptlayer_publish_prompt(prompt_name, prompt_template, tags, api_key):
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 raise Exception(
-                    f"PromptLayer had the following error while publishing your prompt: {request_response.json().get('message')}"
+                    f"Promptlytics had the following error while publishing your prompt: {request_response.json().get('message')}"
                 )
             else:
                 raise Exception(
-                    f"PromptLayer had the following error while publishing your prompt: {request_response}"
+                    f"Promptlytics had the following error while publishing your prompt: {request_response}"
                 )
     except Exception as e:
         raise Exception(
-            f"PromptLayer had the following error while publishing your prompt: {e}"
+            f"Promptlytics had the following error while publishing your prompt: {e}"
         )
     return True
 
 
-def promptlayer_track_prompt(request_id, prompt_name, input_variables, api_key, version):
+def promptlytics_track_prompt(request_id, prompt_name, input_variables, api_key, version):
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/library-track-prompt",
+            f"{URL_API_PROMPTLYTICS}/library-track-prompt",
             json={
                 "request_id": request_id,
                 "prompt_name": prompt_name,
@@ -245,77 +245,77 @@ def promptlayer_track_prompt(request_id, prompt_name, input_variables, api_key, 
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 print(
-                    f"WARNING: While tracking your prompt PromptLayer had the following error: {request_response.json().get('message')}",
+                    f"WARNING: While tracking your prompt Promptlytics had the following error: {request_response.json().get('message')}",
                     file=sys.stderr,
                 )
                 return False
             else:
                 print(
-                    f"WARNING: While tracking your prompt PromptLayer had the following error: {request_response}",
+                    f"WARNING: While tracking your prompt Promptlytics had the following error: {request_response}",
                     file=sys.stderr,
                 )
                 return False
     except Exception as e:
         print(
-            f"WARNING: While tracking your prompt PromptLayer had the following error: {e}",
+            f"WARNING: While tracking your prompt Promptlytics had the following error: {e}",
             file=sys.stderr,
         )
         return False
     return True
 
 
-def promptlayer_track_metadata(request_id, metadata, api_key):
+def promptlytics_track_metadata(request_id, metadata, api_key):
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/library-track-metadata",
+            f"{URL_API_PROMPTLYTICS}/library-track-metadata",
             json={"request_id": request_id,
                   "metadata": metadata, "api_key": api_key, },
         )
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 print(
-                    f"WARNING: While tracking your metadata PromptLayer had the following error: {request_response.json().get('message')}",
+                    f"WARNING: While tracking your metadata Promptlytics had the following error: {request_response.json().get('message')}",
                     file=sys.stderr,
                 )
                 return False
             else:
                 print(
-                    f"WARNING: While tracking your metadata PromptLayer had the following error: {request_response}",
+                    f"WARNING: While tracking your metadata Promptlytics had the following error: {request_response}",
                     file=sys.stderr,
                 )
                 return False
     except Exception as e:
         print(
-            f"WARNING: While tracking your metadata PromptLayer had the following error: {e}",
+            f"WARNING: While tracking your metadata Promptlytics had the following error: {e}",
             file=sys.stderr,
         )
         return False
     return True
 
 
-def promptlayer_track_score(request_id, score, api_key):
+def promptlytics_track_score(request_id, score, api_key):
     try:
         request_response = requests.post(
-            f"{URL_API_PROMPTLAYER}/library-track-score",
+            f"{URL_API_PROMPTLYTICS}/library-track-score",
             json={"request_id": request_id,
                   "score": score, "api_key": api_key, },
         )
         if request_response.status_code != 200:
             if hasattr(request_response, "json"):
                 print(
-                    f"WARNING: While tracking your score PromptLayer had the following error: {request_response.json().get('message')}",
+                    f"WARNING: While tracking your score Promptlytics had the following error: {request_response.json().get('message')}",
                     file=sys.stderr,
                 )
                 return False
             else:
                 print(
-                    f"WARNING: While tracking your score PromptLayer had the following error: {request_response}",
+                    f"WARNING: While tracking your score Promptlytics had the following error: {request_response}",
                     file=sys.stderr,
                 )
                 return False
     except Exception as e:
         print(
-            f"WARNING: While tracking your score PromptLayer had the following error: {e}",
+            f"WARNING: While tracking your score Promptlytics had the following error: {e}",
             file=sys.stderr,
         )
         return False
@@ -348,7 +348,7 @@ class OpenAIGeneratorProxy:
             result.choices[0].finish_reason == "stop"
             or result.choices[0].finish_reason == "length"
         ):
-            request_id = promptlayer_api_request(
+            request_id = promptlytics_api_request(
                 self.api_request_arugments["function_name"],
                 self.api_request_arugments["provider_type"],
                 self.api_request_arugments["args"],

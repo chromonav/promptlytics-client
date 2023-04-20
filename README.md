@@ -2,10 +2,10 @@
 
 **Open source Prompt Observability built on Frappe Framework.**
 
-### Install Promptlyticscl
+### Install promptlytics
 
 ```bash
-pip install promptlyticscl
+pip install promptlytics
 ```
 
 ### Installing Promptlytics Locally
@@ -21,7 +21,7 @@ Once you have that all set up, [install Promptlytics using](https://pypi.org/pro
 In the Python file where you use OpenAI APIs, add the following. This allows us to keep track of your requests without needing any other code changes.
 
 ```python
-import promptlyticscl promptlytics
+import promptlytics
 promptlytics.api_key = "<YOUR Promptlytics API KEY pl_xxxxxx>"
 openai = promptlytics.openai
 ```

@@ -1,17 +1,17 @@
 import os
 
 import openai
-from langchain.chat_models import PromptLayerChatOpenAI
-from langchain.llms import PromptLayerOpenAIChat
+from promptlytics.langchain.chat_models import PromptLyticsChatOpenAI
+from promptlytics.langchain.llms import PromptLyticsOpenAIChat
 
-import promptlayer
+import promptlytics
 
-promptlayer.api_key = os.environ.get("PROMPTLAYER_API_KEY")
-openai = promptlayer.openai
+promptlytics.api_key = os.environ.get("PROMPTLYTICS_API_KEY")
+openai = promptlytics.openai
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def before_all(context):
     context.openai = openai
-    context.langchain_chat_openai = PromptLayerChatOpenAI()
-    context.langchain_openai_chat = PromptLayerOpenAIChat()
+    context.langchain_chat_openai = PromptLyticsChatOpenAI()
+    context.langchain_openai_chat = PromptLyticsOpenAIChat()
